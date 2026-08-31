@@ -1,0 +1,102 @@
+html { scroll-behavior: smooth; }
+
+#home, #work, #services, #about, #contact { scroll-margin-top: 108px; }
+
+.norou-navigation {
+  position: fixed;
+  top: clamp(20px, 4vw, 56px);
+  right: clamp(18px, 8vw, 130px);
+  z-index: 2147482000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 36px);
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 999px;
+  background: rgba(13, 13, 13, .76);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.norou-navigation__links { display: flex; align-items: center; gap: 2px; }
+
+.norou-navigation a {
+  min-height: 40px;
+  color: #f7f5ff;
+  font: 700 13px/1 "Syne", Arial, sans-serif;
+  text-decoration: none;
+}
+
+.norou-navigation__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+}
+
+.norou-navigation__link:hover { color: #a78bfa; background: rgba(123, 87, 255, .12); }
+
+.norou-contact-socials .norou-navigation__social {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, .86);
+}
+
+.norou-contact-socials .norou-navigation__social:hover { color: #fff; background: rgba(123, 87, 255, .2); }
+.norou-contact-socials .norou-navigation__social svg { width: 18px; height: 18px; }
+
+.norou-navigation__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 15px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 999px;
+  background: linear-gradient(110deg, #6d42ff, #43228f);
+  box-shadow: 0 8px 20px rgba(84, 45, 205, .35);
+}
+
+.norou-navigation__cta:hover { background: linear-gradient(110deg, #7c55ff, #5430b3); transform: translateY(-1px); }
+.norou-navigation a:focus-visible { outline: 3px solid #b39aff; outline-offset: 3px; }
+.norou-navigation__original-link { display: none !important; }
+
+.norou-copyright {
+  margin: 24px auto 0;
+  padding: 0 20px 22px;
+  color: rgba(255, 255, 255, .58);
+  font: 500 13px/1.4 Arial, sans-serif;
+  letter-spacing: .01em;
+  text-align: center;
+}
+
+.norou-contact-socials { display: flex; justify-content: center; gap: 8px; margin: 18px auto 0; }
+.norou-contact-socials .norou-navigation__social { min-width: 44px; min-height: 44px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); }
+
+@media (max-width: 1000px) {
+  .norou-navigation { right: 24px; }
+  .norou-navigation__link { padding: 0 7px; }
+}
+
+@media (max-width: 760px) {
+  .norou-navigation {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    border-radius: 20px;
+  }
+  .norou-navigation__links { order: 1; width: 100%; justify-content: center; overflow-x: auto; }
+  .norou-navigation__cta { order: 2; }
+  .norou-navigation a { min-width: 44px; min-height: 44px; }
+  .norou-navigation__link { padding: 0 8px; font-size: 12px; }
+  #home, #work, #services, #about, #contact { scroll-margin-top: 156px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .norou-navigation__cta:hover { transform: none; }
+}

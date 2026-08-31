@@ -1,0 +1,214 @@
+.norou-video-slot {
+  position: relative !important;
+  z-index: 3 !important;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.norou-video-slot > article {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.norou-video-card {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: inherit;
+  background-color: #111;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #fff;
+  cursor: default;
+  font-family: Arial, sans-serif;
+}
+
+.norou-video-card__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .72), transparent 35%, rgba(0, 0, 0, .68));
+}
+
+.norou-video-card__title {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  left: 20px;
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.norou-video-card__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  display: grid;
+  width: 76px;
+  height: 54px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 15px;
+  background: #f00;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .5);
+  color: #fff;
+  cursor: pointer;
+  font-size: 27px;
+  font-family: Arial, sans-serif;
+  line-height: 1;
+  touch-action: manipulation;
+  text-indent: 4px;
+  transform: translate(-50%, -50%);
+  transition: transform .18s ease, background-color .18s ease;
+}
+
+.norou-video-card__play > * {
+  pointer-events: none;
+}
+
+.norou-video-card__hint {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .72);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.norou-video-card__play:hover,
+.norou-video-card__play:focus-visible {
+  background: #c00;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.norou-video-card__play:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.norou-inline-player {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #000;
+  color: #fff;
+  animation: norou-inline-player-in .2s ease both;
+}
+
+.norou-inline-player__toolbar {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 4px 2px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .14);
+  background: #101010;
+}
+
+.norou-inline-player__title {
+  min-width: 0;
+  overflow: hidden;
+  font: 700 14px/1.3 Arial, sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.norou-inline-player__close {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font: 400 30px/1 Arial, sans-serif;
+  touch-action: manipulation;
+}
+
+.norou-inline-player__close:hover,
+.norou-inline-player__close:focus-visible {
+  background: #623bff;
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+
+.norou-inline-player__frame {
+  position: relative;
+  min-height: 0;
+  width: 100%;
+  flex: 1;
+  background: #000;
+}
+
+.norou-inline-player__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@keyframes norou-inline-player-in {
+  from {
+    opacity: 0;
+    transform: scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 700px) {
+  .norou-video-slot {
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    height: calc((100vw - 32px) * .9479167) !important;
+  }
+
+  .norou-video-card__play {
+    width: 72px;
+    height: 52px;
+  }
+
+  .norou-inline-player__toolbar {
+    padding-left: 10px;
+  }
+
+  .norou-inline-player__title {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .norou-video-card__play,
+  .norou-inline-player {
+    animation: none;
+    transition: none;
+  }
+}
