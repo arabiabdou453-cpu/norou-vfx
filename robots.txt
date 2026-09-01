@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://norouvfx.framer.website/sitemap.xml
+Sitemap: https://norou-vfx.netlify.app/sitemap.xml
