@@ -5,7 +5,7 @@
   <p><strong>Premium video editing, visual effects and storytelling for brands, creators and ambitious ideas.</strong></p>
 
   <p>
-    <a href="https://norouvfx.framer.website/"><img src="https://img.shields.io/badge/Live%20Portfolio-7C4DFF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Visit live portfolio" /></a>
+    <a href="https://norou-vfx.netlify.app/"><img src="https://img.shields.io/badge/Live%20Portfolio-7C4DFF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Visit live portfolio" /></a>
     <a href="https://github.com/arabiabdou453-cpu/norou-vfx"><img src="https://img.shields.io/badge/GitHub-111111?style=for-the-badge&logo=github&logoColor=white" alt="GitHub repository" /></a>
     <a href="https://wa.me/+97430189870"><img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" /></a>
     <a href="https://www.instagram.com/norou.vfx"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" /></a>
@@ -127,7 +127,7 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
 <div align="center">
 
-  <a href="https://norouvfx.framer.website/"><img src="https://img.shields.io/badge/OPEN%20NOROUVFX%20PORTFOLIO-7C4DFF?style=for-the-badge&logo=arrow-up-right&logoColor=white" alt="Open Norouvfx portfolio" /></a>
+  <a href="https://norou-vfx.netlify.app/"><img src="https://img.shields.io/badge/OPEN%20NOROUVFX%20PORTFOLIO-7C4DFF?style=for-the-badge&logo=arrow-up-right&logoColor=white" alt="Open Norouvfx portfolio" /></a>
 
   <p><i>Not limited to visuals — we edit to make people feel.</i></p>
 
