@@ -9,6 +9,7 @@
     <script id="norou-youtube-guard">
       (() => {
         "use strict";
+        window.__framer_disable_appear_effects_optimization__ = true;
         const iframePrototype = HTMLIFrameElement.prototype;
         const nativeSetAttribute = Element.prototype.setAttribute;
         const nativeSrc = Object.getOwnPropertyDescriptor(iframePrototype, "src");
@@ -41,6 +42,21 @@
       })();
     </script>
     <!-- End of headStart -->
+    <style id="norou-critical-stability">
+      section[data-framer-name="Hero"] [data-framer-appear-id],section[data-framer-name="Hero"] [data-framer-component-type="RichTextContainer"],section[data-framer-name="Hero"] h1,section[data-framer-name="Hero"] p{opacity:1!important;transform:none!important;filter:none!important;transition:none!important;animation:none!important}
+      section[data-framer-name="Section - Showreel"] [data-framer-name="Video Container"]{opacity:1!important;transform:none!important;transition:none!important;animation:none!important;will-change:auto!important}
+      nav a[data-norou-section-link] .framer-1fjbrv2{opacity:0!important}
+      nav a[data-norou-section-link] .framer-32evbh{--extracted-r6o4lv:rgba(255,255,255,.8)!important}
+      nav a[data-norou-section-link] p{--framer-text-color:rgba(255,255,255,.8)!important;color:rgba(255,255,255,.8)!important}
+      nav a[data-norou-section-link]:hover .framer-1fjbrv2{background:#623bff!important;opacity:1!important}
+      nav a[data-norou-section-link]:hover .framer-32evbh{--extracted-r6o4lv:#623bff!important}
+      nav a[data-norou-section-link]:hover p{--framer-text-color:#623bff!important;color:#623bff!important}
+      @media(min-width:810px){
+        #main nav:not(:has([data-norou-nav-link="Work"])),
+        #main nav:not(:has([data-norou-nav-link="Services"])),
+        #main nav:not(:has([data-norou-nav-link="Contact"])){visibility:hidden!important}
+      }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0d0d0d">
     <meta name="generator" content="Framer 8e1ebfe">
@@ -531,6 +547,7 @@
       .norou-video-modal__close{position:absolute;top:12px;right:12px;z-index:2;border-color:rgba(255,255,255,.4)!important;background:rgba(0,0,0,.72)!important;font-size:22px!important}
       button[aria-label="Previous"],button[aria-label="Next"]{min-width:44px!important;min-height:44px!important}
       #__framer-badge-container{display:none!important}
+      @media(min-width:810px){.norou-service-card-wrap{height:auto!important;min-height:0!important}.norou-service-card{min-height:150px!important;height:auto!important;padding:22px 36px!important}}
       @media(min-width:810px) and (max-width:1199.98px){
         h1.framer-text{max-width:calc(100vw - 64px)!important;font-size:clamp(42px,5.8vw,66px)!important;line-height:1.05!important;overflow:visible!important}
       }
@@ -561,8 +578,15 @@
           ["lejcLUhH5IA", "Project for Gusto Product"]
         ]);
         const gallery = [];
+        const sectionIds = new Set(["home", "work", "services", "about", "contact"]);
+        const navigationTargets = [
+          { label: "Work", href: "#work" },
+          { label: "Services", href: "#services" },
+          { label: "Contact", href: "#contact" }
+        ];
         let activeIndex = 0;
         let lastTrigger = null;
+        let navigationSyncFrame = 0;
 
         const safeVideoId = (source) => {
           const match = source.match(/youtube(?:-nocookie)?\.com\/embed\/([A-Za-z0-9_-]{11})/);
@@ -631,58 +655,95 @@
           });
         };
 
-        const normalizeText = () => {
-          const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-          const replacements = [
-            [/porject ideas/g, "project ideas"],
-            [/Filmmaker , voice-over artist ,/g, "Filmmaker, voice-over artist —"],
-            [/Norou relaxed and patient approach/g, "Norou’s relaxed and patient approach"],
-            [/\bCeo Of\b/g, "CEO of"]
-          ];
-          while (walker.nextNode()) {
-            const node = walker.currentNode;
-            if (node.parentElement?.closest("script,style")) continue;
-            let value = node.nodeValue || "";
-            replacements.forEach(([pattern, replacement]) => { value = value.replace(pattern, replacement); });
-            if (value !== node.nodeValue) node.nodeValue = value;
-          }
-        };
-
         const findHeading = (text) => {
           const matches = Array.from(document.querySelectorAll("h1,h2,h3")).filter((heading) => heading.textContent.includes(text));
           return matches.find((heading) => heading.offsetParent !== null) || matches[0];
         };
 
-        const setSectionAnchor = (element, id) => {
-          const target = element?.closest("section, footer") || element;
+        const setSectionAnchor = (element, id, wholeSection = true, offset = 120) => {
+          const target = wholeSection ? (element?.closest("section, footer") || element) : element;
           if (!target) return null;
+          const previousTarget = document.getElementById(id);
+          if (previousTarget && previousTarget !== target) previousTarget.removeAttribute("id");
           target.id = id;
           target.dataset.norouAnchor = "true";
-          target.style.scrollMarginTop = "120px";
+          target.dataset.norouOffset = String(offset);
+          target.style.scrollMarginTop = `${offset}px`;
           return target;
         };
+
+        const setActiveNavigation = (id) => {
+          document.querySelectorAll("nav a[data-norou-section-link]").forEach((link) => {
+            const isActive = link.dataset.norouSectionLink === id;
+            if (isActive) link.setAttribute("aria-current", "location");
+            else link.removeAttribute("aria-current");
+          });
+        };
+
+        const scrollToSection = (id) => {
+          if (id === "home") {
+            window.scrollTo({ top: 0, behavior: "auto" });
+            setActiveNavigation(id);
+            return true;
+          }
+          const target = document.getElementById(id);
+          if (!target) return false;
+          const offset = Number.parseInt(target.dataset.norouOffset || "120", 10);
+          const alignAfterLayout = () => {
+            const delta = target.getBoundingClientRect().top - offset;
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "auto" });
+          };
+          alignAfterLayout();
+          window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(alignAfterLayout);
+          });
+          setActiveNavigation(id);
+          return true;
+        };
+
+        const syncActiveNavigation = () => {
+          navigationSyncFrame = 0;
+          const marker = window.scrollY + Math.min(window.innerHeight * 0.32, 240);
+          let activeId = "home";
+          sectionIds.forEach((id) => {
+            const target = document.getElementById(id);
+            if (!target) return;
+            const targetTop = window.scrollY + target.getBoundingClientRect().top;
+            if (targetTop <= marker) activeId = id;
+          });
+          if (Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 4) activeId = "contact";
+          setActiveNavigation(activeId);
+        };
+
+        const queueNavigationSync = () => {
+          if (navigationSyncFrame) return;
+          navigationSyncFrame = window.requestAnimationFrame(syncActiveNavigation);
+        };
+
+        const hasCompleteNavigation = () => navigationTargets.every((item) => document.querySelector(`[data-norou-nav-link="${item.label}"]`));
 
         const enableSectionNavigation = () => {
           if (document.documentElement.dataset.norouSectionNavigation === "true") return;
           document.documentElement.dataset.norouSectionNavigation = "true";
-          const sectionIds = new Set(["home", "work", "services", "about", "contact"]);
           document.addEventListener("click", (event) => {
-            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             const source = event.target;
             if (!(source instanceof Element)) return;
             const link = source.closest('a[href^="#"]');
             const id = link?.getAttribute("href")?.slice(1);
             if (!id || !sectionIds.has(id)) return;
-            const target = document.getElementById(id);
-            if (!target) return;
+            if (!document.getElementById(id)) return;
             event.preventDefault();
-            event.stopPropagation();
-            target.scrollIntoView({
-              behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-              block: "start"
-            });
+            event.stopImmediatePropagation();
+            scrollToSection(id);
             history.replaceState(null, "", `#${id}`);
           }, true);
+          window.addEventListener("scroll", queueNavigationSync, { passive: true });
+          window.addEventListener("resize", queueNavigationSync, { passive: true });
+          window.addEventListener("hashchange", () => {
+            const id = window.location.hash.slice(1);
+            if (!sectionIds.has(id) || !scrollToSection(id)) queueNavigationSync();
+          });
         };
 
         const improveNavigation = () => {
@@ -702,31 +763,33 @@
           const about = findHeading("About Me");
           const faq = findHeading("Curious? Check Out the Scoop");
           setSectionAnchor(hero, "home");
-          setSectionAnchor(services, "services");
-          setSectionAnchor(about, "about");
+          setSectionAnchor(about, "about", true, 20);
           if (faq) faq.id = "faq";
+
+          let firstServiceCard = null;
+          ["Pre-Production", "Production", "Post-Production"].forEach((title) => {
+            const heading = findHeading(title);
+            const card = heading?.closest('[data-border="true"]');
+            if (card) {
+              if (!firstServiceCard) firstServiceCard = card;
+              card.classList.add("norou-service-card");
+              card.parentElement?.classList.add("norou-service-card-wrap");
+            }
+          });
+          const servicesPanel = firstServiceCard?.closest('[data-framer-name="Content Wrapper"]') || services;
+          setSectionAnchor(servicesPanel, "services", false, 112);
 
           const showreels = Array.from(document.querySelectorAll('[data-framer-name="Section - Showreel"]'));
           const work = showreels.find((section) => section.offsetParent !== null) || showreels[0];
-          setSectionAnchor(work, "work");
+          const workVideo = work?.querySelector("video");
+          setSectionAnchor(workVideo || work, "work", false, 0);
 
           const footers = Array.from(document.querySelectorAll("footer"));
           const contact = footers.find((footer) => footer.offsetParent !== null) || footers[0];
-          setSectionAnchor(contact, "contact");
+          setSectionAnchor(contact, "contact", false, 92);
 
-          const heroCopy = hero && Array.from(hero.querySelectorAll("p")).find((paragraph) => paragraph.textContent.includes("I’m your creative partner"));
-          if (heroCopy) heroCopy.textContent = "I create commercials that command attention, stories that connect, and social ads people remember. As a filmmaker and voice-over artist, I bring your vision to life — frame by frame.";
-
-          const contactHeadline = Array.from(document.querySelectorAll("h3")).find((heading) => heading.offsetParent !== null && heading.textContent.includes("Got questions, project ideas"));
-          if (contactHeadline) contactHeadline.textContent = "Have a project in mind? Let’s make something people remember.";
-
-          const navigationTargets = [
-            { label: "Work", href: "#work" },
-            { label: "Services", href: "#services" },
-            { label: "Contact", href: "#contact" }
-          ];
-          const visibleLinks = Array.from(document.querySelectorAll("nav a")).filter((link) => link.offsetParent !== null);
-          const aboutLink = visibleLinks.find((link) => link.textContent.trim() === "About");
+          const visibleLinks = Array.from(document.querySelectorAll("a")).filter((link) => link.offsetParent !== null && link.textContent.trim() === "About");
+          const aboutLink = visibleLinks.find((link) => link.closest("nav, header") !== null) || visibleLinks[0];
           const navTemplate = aboutLink?.closest(".framer-5v3r3d-container");
           if (aboutLink && navTemplate) {
             navigationTargets.forEach((item) => {
@@ -740,7 +803,11 @@
               link.target = "_self";
               link.removeAttribute("data-framer-page-link-current");
               label.textContent = item.label;
-              navTemplate.parentElement?.insertBefore(container, navTemplate);
+              if (item.label === "Contact") {
+                navTemplate.parentElement?.append(container);
+              } else {
+                navTemplate.parentElement?.insertBefore(container, navTemplate);
+              }
             });
           }
 
@@ -772,6 +839,13 @@
             }
           });
 
+          document.querySelectorAll('nav a[href^="#"]').forEach((link) => {
+            const id = link.getAttribute("href")?.slice(1) || "";
+            if (!sectionIds.has(id)) return;
+            link.dataset.norouSectionLink = id;
+            link.removeAttribute("data-framer-page-link-current");
+          });
+
           footers.forEach((footer) => {
             if (footer.querySelector(".norou-copyright")) return;
             const copyright = document.createElement("p");
@@ -782,10 +856,26 @@
           });
 
           enableSectionNavigation();
-          const initialId = window.location.hash.slice(1);
-          const initialTarget = document.getElementById(initialId);
-          if (initialTarget) {
-            window.requestAnimationFrame(() => initialTarget.scrollIntoView({ behavior: "auto", block: "start" }));
+          if (document.documentElement.dataset.norouInitialNavigationChecked !== "true") {
+            document.documentElement.dataset.norouInitialNavigationChecked = "true";
+            const initialId = window.location.hash.slice(1);
+            if (sectionIds.has(initialId)) {
+              window.requestAnimationFrame(() => scrollToSection(initialId));
+            } else {
+              syncActiveNavigation();
+            }
+          } else {
+            syncActiveNavigation();
+          }
+
+          const navigationHost = document.getElementById("main");
+          if (navigationHost && document.documentElement.dataset.norouNavigationObserver !== "true") {
+            document.documentElement.dataset.norouNavigationObserver = "true";
+            const observer = new MutationObserver(() => {
+              if (!hasCompleteNavigation()) improveNavigation();
+            });
+            observer.observe(navigationHost, { childList: true, subtree: true });
+            window.setTimeout(() => observer.disconnect(), 8000);
           }
         };
 
@@ -849,7 +939,6 @@
           document.title = "Norouvfx | Video Editor, Filmmaker & VFX Artist";
           removeFramerArtifacts();
           enhanceYouTubeFrames();
-          normalizeText();
           improveNavigation();
           improveInteractiveSemantics();
         };
@@ -870,12 +959,21 @@
         });
 
         const startEnhancements = () => {
+          if (document.documentElement.dataset.norouEnhancementsStarted === "true") return;
+          document.documentElement.dataset.norouEnhancementsStarted = "true";
           enhancePage();
         };
 
-        const scheduleEnhancements = () => window.setTimeout(startEnhancements, 2500);
-        if (document.readyState === "complete") scheduleEnhancements();
-        else window.addEventListener("load", scheduleEnhancements, { once: true });
+        window.addEventListener("load", startEnhancements, { once: true });
+        window.addEventListener("load", () => {
+          const id = window.location.hash.slice(1);
+          if (sectionIds.has(id)) {
+            improveNavigation();
+            window.requestAnimationFrame(() => scrollToSection(id));
+          } else {
+            syncActiveNavigation();
+          }
+        }, { once: true });
       })();
     </script>
     

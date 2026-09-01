@@ -10,6 +10,8 @@ $robots = Get-Content -Raw -LiteralPath $robotsPath
 $playerScript = if (Test-Path -LiteralPath $playerScriptPath) { Get-Content -Raw -LiteralPath $playerScriptPath } else { '' }
 $playerStyle = if (Test-Path -LiteralPath $playerStylePath) { Get-Content -Raw -LiteralPath $playerStylePath } else { '' }
 $htmlWithoutScripts = [regex]::Replace($html, '<script\b[^>]*>.*?</script>', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+$headEnd = $html.IndexOf('</head>', [System.StringComparison]::OrdinalIgnoreCase)
+$headHtml = if ($headEnd -ge 0) { $html.Substring(0, $headEnd) } else { '' }
 
 $checks = [ordered]@{
     'Correct portfolio metadata' = $html -notmatch 'StoryStream|Real Mehedi'
@@ -21,7 +23,7 @@ $checks = [ordered]@{
     'No YouTube iframe loads before user action' = $html -notmatch '<iframe[^>]+src="https://www\.youtube(?:-nocookie)?\.com/embed/'
     'Early guard blocks Framer YouTube requests' = $html -match 'id="norou-youtube-guard"' -and $html -match 'HTMLIFrameElement\.prototype'
     'Lazy video placeholders configured' = $html -match 'data-norou-video-id="[A-Za-z0-9_-]{11}"'
-    'Dedicated video player installed' = $html -match 'assets/norou-player\.js' -and $playerScript.Length -gt 0
+    'Dedicated video player installed after hydration' = $html -match 'assets/norou-player\.js' -and $playerScript.Length -gt 0 -and $playerScript -match 'window\.addEventListener\("load", initialize'
     'Player assets are cache-busted' = $html -match 'assets/norou-player\.js\?v=20260831' -and $html -match 'assets/norou-player\.css\?v=20260831'
     'Only clicked video may autoplay' = $html -notmatch '<iframe[^>]+autoplay=1' -and $playerScript -match 'autoplay=1'
     'Active inline iframe bypasses placeholder observer' = $playerScript -match 'norouPlayerActive\s*===\s*"true"'
@@ -42,19 +44,36 @@ $checks = [ordered]@{
     'Six portfolio video IDs configured' = @('_j9ewTMvYvk', 'doOU2AIX2r4', 'KnavSFeuBNI', 'tSyr8gRAS7Y', '-BWhYYHI5Wk', 'lejcLUhH5IA') | ForEach-Object { $html -match [regex]::Escape($_) } | Where-Object { -not $_ } | Measure-Object | Select-Object -ExpandProperty Count | ForEach-Object { $_ -eq 0 }
     'Reduced motion supported' = $html -match 'prefers-reduced-motion: reduce'
     'Project typo corrected in source' = $htmlWithoutScripts -notmatch 'porject'
-    'Project typo corrected after hydration' = $html -match '\[/porject ideas/g, "project ideas"\]'
-    'Original Home and About navigation fixed' = $html -match 'setSectionAnchor\(hero,\s*"home"\)' -and $html -match 'text\s*===\s*"Home"' -and $html -match 'link\.href\s*=\s*"#about"'
+    'Text is never rewritten after the first paint' = $html -notmatch 'normalizeText\('
+    'Original Home and About navigation fixed' = $html -match 'setSectionAnchor\(hero,\s*"home"\)' -and $html -match 'setSectionAnchor\(about,\s*"about",\s*true,\s*20\)' -and $html -match 'text\s*===\s*"Home"' -and $html -match 'link\.href\s*=\s*"#about"'
     'Navigation targets visible Framer variant' = $html -match 'offsetParent\s*!==\s*null'
-    'Section anchors target complete sections' = $html -match 'setSectionAnchor' -and $html -match 'dataset\.norouAnchor' -and $html -match 'scrollMarginTop\s*=\s*"120px"'
-    'Section navigation scrolls safely below the navbar' = $html -match 'enableSectionNavigation' -and $html -match 'scrollIntoView' -and $html -match 'history\.replaceState'
-    'Direct section URLs are restored after Framer hydration' = $html -match 'initialId\s*=\s*window\.location\.hash\.slice\(1\)' -and $html -match 'initialTarget\.scrollIntoView'
+    'Work anchors the visible video at the viewport top' = $html -match 'const workVideo = work\?\.querySelector\("video"\)' -and $html -match 'setSectionAnchor\(workVideo \|\| work, "work", false, 0\)'
+    'Contact anchors the complete footer below the navbar' = $html -match 'setSectionAnchor\(contact, "contact", false, 92\)'
+    'Section navigation jumps immediately below the navbar' = $html -match 'enableSectionNavigation' -and $html -match 'getBoundingClientRect\(\)\.top - offset' -and $html -match 'behavior:\s*"auto"' -and $html -notmatch 'behavior:\s*window\.matchMedia'
+    'Section navigation corrects a post-layout offset' = $html -match 'const alignAfterLayout' -and $html -match 'window\.requestAnimationFrame\(\(\) => \{\s*window\.requestAnimationFrame\(alignAfterLayout\);'
+    'Navbar click handler cannot be skipped by Framer prevention' = $html -notmatch 'if \(event\.defaultPrevented \|\| event\.button !== 0'
+    'Navbar state remains accessible without persistent visual color' = $html -match 'data-norou-section-link' -and $html -match 'setActiveNavigation' -and $html -match 'aria-current' -and $headHtml -notmatch '\[aria-current="location"\][^{]*\{[^}]*#623bff'
+    'Navbar accent appears only on pointer hover' = $headHtml -match 'a\[data-norou-section-link\]:hover[^\{]*\.framer-1fjbrv2' -and $headHtml -match 'a\[data-norou-section-link\]:hover[^\{]*p'
+    'Home always returns to the document top' = $html -match 'id\s*===\s*"home"' -and $html -match 'top:\s*0'
+    'Direct section URLs are restored after Framer hydration' = $html -match 'scrollToSection' -and $html -match 'window\.addEventListener\("load"' -and $html -match 'window\.location\.hash\.slice\(1\)'
     'Showreel autoplays once without looping' = $html -match '<video[^>]+autoplay' -and $html -match 'showreel\.loop\s*=\s*false' -and $html -match 'showreel\.autoplay\s*=\s*true' -and $html -match 'showreel\.preload\s*=\s*"auto"'
+    'Enhancements wait for Framer hydration' = $html -match 'window\.addEventListener\("load", startEnhancements' -and $html -notmatch '(?m)^\s*startEnhancements\(\);\s*$'
+    'Navbar survives Framer hydration without delayed page reveal' = $html -match 'data-norou-nav-link="Work"' -and $html -match 'new MutationObserver' -and $html -notmatch ', 900\)'
+    'Critical hero and navbar stability CSS loads from the head' = $headHtml -match 'id="norou-critical-stability"' -and $headHtml -match 'section\[data-framer-name="Hero"\].*data-framer-appear-id.*opacity:\s*1\s*!important' -and $headHtml -match 'filter:none!important' -and $headHtml -match 'nav:not\(:has\(\[data-norou-nav-link="Work"\]\)\)'
+    'Showreel layout is stable before Work navigation' = $headHtml -match 'section\[data-framer-name="Section - Showreel"\].*data-framer-name="Video Container".*transform:none!important'
+    'Navbar recovery is scoped and temporary' = $html -match 'new MutationObserver' -and $html -match 'getElementById\("main"\)' -and $html -match 'observer\.disconnect\(\)' -and $html -match ', 8000\)'
+    'Incomplete desktop navbar never flashes' = $headHtml -match 'nav:not\(:has\(\[data-norou-nav-link="Work"\]\)\)[^{]*\{[^}]*visibility:\s*hidden\s*!important'
+    'Service cards are compact on desktop' = $html -match 'norou-service-card-wrap' -and $html -match 'min-height:150px!important' -and $html -match 'padding:22px 36px!important'
+    'Services opens below the 92px navbar' = $html -match 'servicesPanel' -and $html -match 'Content Wrapper' -and $html -match 'setSectionAnchor\(servicesPanel, "services", false, 112\)'
+    'Page is never hidden while waiting for enhancements' = $html -notmatch '#main\s*\{\s*visibility:\s*hidden' -and $html -notmatch 'classList\.add\("norou-ready"\)'
     'Footer keeps only the WhatsApp Hire Me CTA' = $html -match 'Hire Me on WhatsApp' -and $html -match 'ctaContainer\.style\.display\s*=\s*"none"' -and $html -match 'link\.getAttribute\("href"\)'
     'Heavy custom navigation remains disabled' = $html -notmatch 'assets/norou-navigation\.(?:js|css)'
     'Professional section links are configured' = $html -match 'data-norou-nav-link' -and $html -match 'Work' -and $html -match 'Services' -and $html -match 'Contact'
+    'Navbar order ends with Contact' = $html -match '\{ label: "Services", href: "#services" \},\s*\{ label: "Contact", href: "#contact" \}' -and $html -match 'item\.label\s*===\s*"Contact"'
+    'Navbar does not duplicate About' = $html -notmatch '\{ label: "About", href: "#about" \},'
     'Duplicated Instagram CTA is removed' = $html -match 'framer-q1WkO' -and $html -match 'style\.display\s*=\s*"none"'
     'Copyright is configured' = $html -match '© 2026 Norouvfx\. All rights reserved\.'
-    'Hero and contact copy are improved' = $html -match 'commercials that command attention' -and $html -match 'Let’s make something people remember'
+    'Hero and contact copy remain original' = $html -match "I’m your creative partner" -and $html -notmatch "I create commercials that command attention" -and $html -notmatch "Have a project in mind\? Let’s make something people remember\."
     'Robots references sitemap' = $robots -match '(?m)^Sitemap:'
 }
 
