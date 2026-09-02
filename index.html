@@ -55,6 +55,10 @@
       html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
       #main nav{visibility:hidden!important}
       html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
+      @media(max-width:809.98px){
+        .ssr-variant.hidden-x927ye:has(nav[data-framer-name="Desktop"]){display:contents!important}
+        .ssr-variant.hidden-k2fatd:has(nav[data-framer-name="Phone - Collapsed"]){display:none!important}
+      }
       @media(min-width:810px){
         #main nav:not(:has([data-norou-nav-link="Work"])),
         #main nav:not(:has([data-norou-nav-link="Services"])),
