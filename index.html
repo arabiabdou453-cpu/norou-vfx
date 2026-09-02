@@ -717,7 +717,11 @@
           const marker = window.scrollY + Math.min(window.innerHeight * 0.32, 240);
           let activeId = "home";
           sectionIds.forEach((id) => {
-            const target = document.getElementById(id);
+            let target = document.getElementById(id);
+            if (!target) {
+              improveNavigation();
+              target = document.getElementById(id);
+            }
             if (!target) return;
             const targetTop = window.scrollY + target.getBoundingClientRect().top;
             if (targetTop <= marker) activeId = id;
@@ -916,7 +920,7 @@
           if (navigationHost && document.documentElement.dataset.norouNavigationObserver !== "true") {
             document.documentElement.dataset.norouNavigationObserver = "true";
             const observer = new MutationObserver(() => {
-              if (!hasCompleteNavigation()) improveNavigation();
+              if (!hasCompleteNavigation() || !document.getElementById("contact") || !document.querySelector("footer .norou-copyright")) improveNavigation();
             });
             observer.observe(navigationHost, { childList: true, subtree: true });
             window.setTimeout(() => observer.disconnect(), 8000);
