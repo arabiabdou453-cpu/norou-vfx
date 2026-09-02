@@ -561,13 +561,6 @@
         .norou-video-modal__controls button{flex:1}
         .norou-video-launcher__play{width:62px;height:62px}
       }
-      @media(max-width:809.98px){
-        html,body{max-width:100%;min-height:100%;overflow-x:hidden;overflow-y:auto!important}
-        #main{height:auto!important;min-height:100vh!important;overflow:visible!important}
-        nav[data-framer-name="Phone - Collapsed"]{width:100%!important;max-width:100vw!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none}
-        nav[data-framer-name="Phone - Collapsed"]::-webkit-scrollbar{display:none}
-        nav[data-framer-name="Phone - Collapsed"] a{flex-shrink:0!important}
-      }
       @media (prefers-reduced-motion: reduce){
         *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
       }
@@ -985,18 +978,6 @@
     </script>
     
     <script src="./assets/norou-player.js?v=20260831-4"></script>
-    <script>
-      (() => {
-        if (!window.matchMedia("(max-width: 809.98px)").matches) return;
-        const stylesheet = document.createElement("link");
-        stylesheet.rel = "stylesheet";
-        stylesheet.href = "./assets/norou-navigation.css?v=20260831-6";
-        document.head.append(stylesheet);
-        const navigationScript = document.createElement("script");
-        navigationScript.src = "./assets/norou-navigation.js?v=20260831-6";
-        document.body.append(navigationScript);
-      })();
-    </script>
     <!-- End of bodyEnd -->
 </body>
 </html>
