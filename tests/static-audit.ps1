@@ -67,7 +67,7 @@ $checks = [ordered]@{
     'Services opens below the 92px navbar' = $html -match 'servicesPanel' -and $html -match 'Content Wrapper' -and $html -match 'setSectionAnchor\(servicesPanel, "services", false, 112\)'
     'Page is never hidden while waiting for enhancements' = $html -notmatch '#main\s*\{\s*visibility:\s*hidden' -and $html -notmatch 'classList\.add\("norou-ready"\)'
     'Footer keeps only the WhatsApp Hire Me CTA' = $html -match 'Hire Me on WhatsApp' -and $html -match 'ctaContainer\.style\.display\s*=\s*"none"' -and $html -match 'link\.getAttribute\("href"\)'
-    'Heavy custom navigation remains disabled' = $html -notmatch 'assets/norou-navigation\.(?:js|css)'
+    'Mobile navigation enhancement loaded' = $html -match 'assets/norou-navigation\.js\?v=20260831-6' -and $html -match 'assets/norou-navigation\.css\?v=20260831-6' -and $html -match 'max-width: 809\.98px'
     'Professional section links are configured' = $html -match 'data-norou-nav-link' -and $html -match 'Work' -and $html -match 'Services' -and $html -match 'Contact'
     'Navbar order ends with Contact' = $html -match '\{ label: "Services", href: "#services" \},\s*\{ label: "Contact", href: "#contact" \}' -and $html -match 'item\.label\s*===\s*"Contact"'
     'Navbar does not duplicate About' = $html -notmatch '\{ label: "About", href: "#about" \},'
