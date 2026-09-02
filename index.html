@@ -732,7 +732,7 @@
         const enableSectionNavigation = () => {
           if (document.documentElement.dataset.norouSectionNavigation === "true") return;
           document.documentElement.dataset.norouSectionNavigation = "true";
-          window.addEventListener("click", (event) => {
+          const navigateFromEvent = (event) => {
             if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             const source = event.target;
             if (!(source instanceof Element)) return;
@@ -744,6 +744,22 @@
             event.stopImmediatePropagation();
             scrollToSection(id);
             history.replaceState(null, "", `#${id}`);
+            return link;
+          };
+          window.addEventListener("pointerdown", (event) => {
+            const link = navigateFromEvent(event);
+            if (link instanceof HTMLAnchorElement) link.dataset.norouPointerHandled = "true";
+          }, true);
+          window.addEventListener("click", (event) => {
+            const source = event.target;
+            const link = source instanceof Element ? source.closest('nav a[href^="#"]') : null;
+            if (link instanceof HTMLAnchorElement && link.dataset.norouPointerHandled === "true") {
+              delete link.dataset.norouPointerHandled;
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              return;
+            }
+            navigateFromEvent(event);
           }, true);
           window.addEventListener("scroll", queueNavigationSync, { passive: true });
           window.addEventListener("resize", queueNavigationSync, { passive: true });
