@@ -56,11 +56,6 @@
         #main nav:not(:has([data-norou-nav-link="Services"])),
         #main nav:not(:has([data-norou-nav-link="Contact"])){visibility:hidden!important}
       }
-      @media(max-width:809.98px){
-        #main nav:not(:has([data-norou-nav-link="Work"])),
-        #main nav:not(:has([data-norou-nav-link="Services"])),
-        #main nav:not(:has([data-norou-nav-link="Contact"])){visibility:hidden!important}
-      }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0d0d0d">
@@ -560,11 +555,14 @@
         .norou-youtube-container{width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important}
         iframe[src*="youtube-nocookie.com/embed/"]{width:100%!important;max-width:100%!important;height:100%!important}
         .norou-video-modal{padding:8px}
-        .norou-video-modal__dialog{border-radius:12px}
+        .norou-video-modal__dialog{width:100%;max-width:100%;border-radius:12px}
+        .norou-video-modal__frame{aspect-ratio:16/10}
         .norou-video-modal__bar{align-items:flex-start;flex-direction:column;padding:10px}
         .norou-video-modal__controls{width:100%}
         .norou-video-modal__controls button{flex:1}
         .norou-video-launcher__play{width:62px;height:62px}
+        .norou-video-modal__title{max-width:calc(100% - 8px);white-space:normal;overflow-wrap:anywhere}
+        .norou-video-modal__close{top:8px;right:8px}
       }
       @media (prefers-reduced-motion: reduce){
         *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -797,9 +795,6 @@
           const aboutLink = visibleLinks.find((link) => link.closest("nav, header") !== null) || visibleLinks[0];
           const navTemplate = aboutLink?.closest(".framer-5v3r3d-container");
           if (aboutLink && navTemplate) {
-            const aboutContainer = navTemplate;
-            const aboutAnchor = aboutContainer.querySelector("a");
-            if (aboutAnchor) aboutAnchor.dataset.norouNavLink = "About";
             navigationTargets.forEach((item) => {
               if (document.querySelector(`[data-norou-nav-link="${item.label}"]`)) return;
               const container = navTemplate.cloneNode(true);
@@ -817,21 +812,6 @@
                 navTemplate.parentElement?.insertBefore(container, navTemplate);
               }
             });
-
-            const navParent = navTemplate.parentElement;
-            if (navParent) {
-              const order = new Map(navigationTargets.map((item, index) => [item.label, index]));
-              const navigationContainers = Array.from(navParent.children).filter((container) => {
-                const link = container.querySelector("a[data-norou-nav-link]");
-                return link instanceof HTMLAnchorElement && order.has(link.dataset.norouNavLink || "");
-              });
-              navigationContainers.sort((first, second) => {
-                const firstLink = first.querySelector("a[data-norou-nav-link]");
-                const secondLink = second.querySelector("a[data-norou-nav-link]");
-                return (order.get(firstLink?.dataset.norouNavLink || "") || 0) - (order.get(secondLink?.dataset.norouNavLink || "") || 0);
-              });
-              navigationContainers.forEach((container) => navParent.append(container));
-            }
           }
 
           document.querySelectorAll("a").forEach((link) => {
