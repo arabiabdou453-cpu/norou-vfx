@@ -15,7 +15,7 @@ $headHtml = if ($headEnd -ge 0) { $html.Substring(0, $headEnd) } else { '' }
 
 $checks = [ordered]@{
     'Correct portfolio metadata' = $html -notmatch 'StoryStream|Real Mehedi'
-    'Responsive viewport configured' = $html -match 'width=device-width, initial-scale=1'
+    'Desktop viewport is preserved on mobile' = $html -match 'navigator\.maxTouchPoints\s*>\s*0' -and $html -match 'width=1200, initial-scale=1'
     'Theme color configured' = $html -match 'name="theme-color"'
     'Structured data configured' = $html -match 'application/ld\+json'
     'Framer editor preload removed' = $html -notmatch 'framer_force_showing_editorbar_since'
