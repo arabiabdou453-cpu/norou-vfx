@@ -24,7 +24,7 @@ $checks = [ordered]@{
     'Early guard blocks Framer YouTube requests' = $html -match 'id="norou-youtube-guard"' -and $html -match 'HTMLIFrameElement\.prototype'
     'Lazy video placeholders configured' = $html -match 'data-norou-video-id="[A-Za-z0-9_-]{11}"'
     'Dedicated video player installed after hydration' = $html -match 'assets/norou-player\.js' -and $playerScript.Length -gt 0 -and $playerScript -match 'window\.addEventListener\("load", initialize'
-    'Player assets are cache-busted' = $html -match 'assets/norou-player\.js\?v=20260831' -and $html -match 'assets/norou-player\.css\?v=20260831'
+    'Player assets are cache-busted' = $html -match 'assets/norou-player\.js\?v=\d{8}-\d+' -and $html -match 'assets/norou-player\.css\?v=\d{8}-\d+'
     'Only clicked video may autoplay' = $html -notmatch '<iframe[^>]+autoplay=1' -and $playerScript -match 'autoplay=1'
     'Active inline iframe bypasses placeholder observer' = $playerScript -match 'norouPlayerActive\s*===\s*"true"'
     'Closing destroys the active inline iframe' = $playerScript -match 'closeActivePlayer' -and $playerScript -match 'activePlayer\.layer\.remove\(\)'
