@@ -56,6 +56,11 @@
         #main nav:not(:has([data-norou-nav-link="Services"])),
         #main nav:not(:has([data-norou-nav-link="Contact"])){visibility:hidden!important}
       }
+      @media(max-width:809.98px){
+        #main nav:not(:has([data-norou-nav-link="Work"])),
+        #main nav:not(:has([data-norou-nav-link="Services"])),
+        #main nav:not(:has([data-norou-nav-link="Contact"])){visibility:hidden!important}
+      }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0d0d0d">
@@ -792,6 +797,9 @@
           const aboutLink = visibleLinks.find((link) => link.closest("nav, header") !== null) || visibleLinks[0];
           const navTemplate = aboutLink?.closest(".framer-5v3r3d-container");
           if (aboutLink && navTemplate) {
+            const aboutContainer = navTemplate;
+            const aboutAnchor = aboutContainer.querySelector("a");
+            if (aboutAnchor) aboutAnchor.dataset.norouNavLink = "About";
             navigationTargets.forEach((item) => {
               if (document.querySelector(`[data-norou-nav-link="${item.label}"]`)) return;
               const container = navTemplate.cloneNode(true);
@@ -809,6 +817,21 @@
                 navTemplate.parentElement?.insertBefore(container, navTemplate);
               }
             });
+
+            const navParent = navTemplate.parentElement;
+            if (navParent) {
+              const order = new Map(navigationTargets.map((item, index) => [item.label, index]));
+              const navigationContainers = Array.from(navParent.children).filter((container) => {
+                const link = container.querySelector("a[data-norou-nav-link]");
+                return link instanceof HTMLAnchorElement && order.has(link.dataset.norouNavLink || "");
+              });
+              navigationContainers.sort((first, second) => {
+                const firstLink = first.querySelector("a[data-norou-nav-link]");
+                const secondLink = second.querySelector("a[data-norou-nav-link]");
+                return (order.get(firstLink?.dataset.norouNavLink || "") || 0) - (order.get(secondLink?.dataset.norouNavLink || "") || 0);
+              });
+              navigationContainers.forEach((container) => navParent.append(container));
+            }
           }
 
           document.querySelectorAll("a").forEach((link) => {
