@@ -53,6 +53,8 @@
       nav a[data-norou-section-link]:hover p{--framer-text-color:#623bff!important;color:#623bff!important}
       #main nav{visibility:hidden!important}
       html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
+      #main nav{visibility:hidden!important}
+      html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
       @media(min-width:810px){
         #main nav:not(:has([data-norou-nav-link="Work"])),
         #main nav:not(:has([data-norou-nav-link="Services"])),
@@ -813,6 +815,21 @@
               } else {
                 navTemplate.parentElement?.insertBefore(container, navTemplate);
               }
+            });
+
+            const navigationOrder = new Map([
+              ["Home", 0],
+              ["Work", 1],
+              ["Services", 2],
+              ["About", 3],
+              ["Contact", 4]
+            ]);
+            navTemplate.parentElement?.querySelectorAll(":scope > *").forEach((container) => {
+              const link = container.querySelector("a");
+              const label = link?.dataset.norouNavLink || link?.textContent?.trim() || "";
+              const order = navigationOrder.get(label);
+              if (order === undefined) return;
+              container.style.order = String(order);
             });
           }
 
