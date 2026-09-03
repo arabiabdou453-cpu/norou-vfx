@@ -53,7 +53,6 @@
       nav a[data-norou-section-link]:hover p{--framer-text-color:#623bff!important;color:#623bff!important}
       #main nav{visibility:hidden!important}
       html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
-      #main nav{display:none!important}
       #main nav{visibility:hidden!important}
       html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
       @media(max-width:809.98px){
@@ -534,7 +533,10 @@
 </div>
     <!-- Start of bodyEnd -->
     <link rel="stylesheet" href="./assets/norou-player.css?v=20260831-4">
+    <link rel="stylesheet" href="./assets/norou-navigation.css?v=20260903-1">
     <style id="norou-quality-fixes">
+      /* Hide Framer's original 3-breakpoint navbar (Desktop/Tablet/Phone) — replaced by the unified norou-navigation component so desktop edits always match mobile */
+      .framer-2yss2a-container{display:none !important}
       .norou-skip-link{position:fixed;top:12px;left:12px;z-index:2147483647;padding:12px 18px;border-radius:10px;background:#fff;color:#0d0d0d;font:700 15px/1.2 Arial,sans-serif;transform:translateY(-180%);transition:transform .2s ease}
       .norou-skip-link:focus{transform:translateY(0)}
       :focus-visible{outline:3px solid #8b6cff!important;outline-offset:4px!important}
@@ -1027,8 +1029,7 @@
     </script>
     
     <script src="./assets/norou-player.js?v=20260831-4"></script>
-    <link rel="stylesheet" href="./assets/norou-navigation.css?v=20260831-6">
-    <script src="./assets/norou-navigation.js?v=20260831-6"></script>
+    <script src="./assets/norou-navigation.js?v=20260903-1"></script>
     <!-- End of bodyEnd -->
 </body>
 </html>
