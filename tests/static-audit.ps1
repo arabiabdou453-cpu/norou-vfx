@@ -5,10 +5,14 @@ $htmlPath = Join-Path $projectRoot 'index.html'
 $robotsPath = Join-Path $projectRoot 'robots.txt'
 $playerScriptPath = Join-Path $projectRoot 'assets\norou-player.js'
 $playerStylePath = Join-Path $projectRoot 'assets\norou-player.css'
+$navigationScriptPath = Join-Path $projectRoot 'assets\norou-navigation.js'
+$navigationStylePath = Join-Path $projectRoot 'assets\norou-navigation.css'
 $html = Get-Content -Raw -LiteralPath $htmlPath
 $robots = Get-Content -Raw -LiteralPath $robotsPath
 $playerScript = if (Test-Path -LiteralPath $playerScriptPath) { Get-Content -Raw -LiteralPath $playerScriptPath } else { '' }
 $playerStyle = if (Test-Path -LiteralPath $playerStylePath) { Get-Content -Raw -LiteralPath $playerStylePath } else { '' }
+$navigationScript = if (Test-Path -LiteralPath $navigationScriptPath) { Get-Content -Raw -LiteralPath $navigationScriptPath } else { '' }
+$navigationStyle = if (Test-Path -LiteralPath $navigationStylePath) { Get-Content -Raw -LiteralPath $navigationStylePath } else { '' }
 $htmlWithoutScripts = [regex]::Replace($html, '<script\b[^>]*>.*?</script>', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
 $headEnd = $html.IndexOf('</head>', [System.StringComparison]::OrdinalIgnoreCase)
 $headHtml = if ($headEnd -ge 0) { $html.Substring(0, $headEnd) } else { '' }
@@ -67,7 +71,8 @@ $checks = [ordered]@{
     'Services opens below the 92px navbar' = $html -match 'servicesPanel' -and $html -match 'Content Wrapper' -and $html -match 'setSectionAnchor\(servicesPanel, "services", false, 112\)'
     'Page is never hidden while waiting for enhancements' = $html -notmatch '#main\s*\{\s*visibility:\s*hidden' -and $html -notmatch 'classList\.add\("norou-ready"\)'
     'Footer keeps only the WhatsApp Hire Me CTA' = $html -match 'Hire Me on WhatsApp' -and $html -match 'ctaContainer\.style\.display\s*=\s*"none"' -and $html -match 'link\.getAttribute\("href"\)'
-    'Mobile navigation enhancement loaded' = $html -match 'assets/norou-navigation\.js\?v=20260831-6' -and $html -match 'assets/norou-navigation\.css\?v=20260831-6' -and $html -match 'max-width: 809\.98px'
+    'Unified navigation assets are loaded' = $html -match 'assets/norou-navigation\.js\?v=20260831-6' -and $html -match 'assets/norou-navigation\.css\?v=20260831-6' -and $navigationScript.Length -gt 0 -and $navigationStyle.Length -gt 0
+    'Framer navigation is hidden for unified navigation' = $html -match '#main nav\{display:none!important\}'
     'Professional section links are configured' = $html -match 'data-norou-nav-link' -and $html -match 'Work' -and $html -match 'Services' -and $html -match 'Contact'
     'Navbar order ends with Contact' = $html -match '\{ label: "Services", href: "#services" \},\s*\{ label: "Contact", href: "#contact" \}' -and $html -match 'item\.label\s*===\s*"Contact"'
     'Navbar does not duplicate About' = $html -notmatch '\{ label: "About", href: "#about" \},'
