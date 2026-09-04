@@ -745,35 +745,6 @@
 
         const isDesktopNavigation = () => window.matchMedia("(min-width: 810px)").matches;
 
-        let desktopScrollAnimationFrame = 0;
-        let desktopScrollTarget = null;
-        const cancelDesktopScrollAnimation = () => {
-          if (desktopScrollAnimationFrame) window.cancelAnimationFrame(desktopScrollAnimationFrame);
-          desktopScrollAnimationFrame = 0;
-          desktopScrollTarget = null;
-        };
-        const animateDesktopScrollTo = (targetY) => {
-          if (!Number.isFinite(targetY)) return;
-          desktopScrollTarget = Math.max(0, targetY);
-          if (desktopScrollAnimationFrame) return;
-          const startY = window.scrollY;
-          const startedAt = performance.now();
-          const duration = 240;
-          const step = (now) => {
-            const progress = Math.min(1, (now - startedAt) / duration);
-            const eased = 1 - ((1 - progress) ** 3);
-            const currentTarget = desktopScrollTarget ?? targetY;
-            window.scrollTo({ top: startY + ((currentTarget - startY) * eased), behavior: "auto" });
-            if (progress < 1) {
-              desktopScrollAnimationFrame = window.requestAnimationFrame(step);
-            } else {
-              desktopScrollAnimationFrame = 0;
-              desktopScrollTarget = null;
-            }
-          };
-          desktopScrollAnimationFrame = window.requestAnimationFrame(step);
-        };
-
         const settleDesktopNavigation = (target, offset) => {
           if (!isDesktopNavigation()) return;
           stopDesktopNavigationSettlement();
@@ -783,7 +754,7 @@
           const align = () => {
             alignmentFrame = 0;
             const delta = target.getBoundingClientRect().top - offset;
-            if (Math.abs(delta) > 1) animateDesktopScrollTo(window.scrollY + delta);
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "auto" });
           };
           const queueAlignment = () => {
             if (!initialResizeNotificationSkipped) {
@@ -795,7 +766,6 @@
           const layoutObserver = new ResizeObserver(queueAlignment);
           const mutationObserver = new MutationObserver(queueAlignment);
           const stop = () => {
-            cancelDesktopScrollAnimation();
             if (alignmentFrame) window.cancelAnimationFrame(alignmentFrame);
             if (settlementTimer) window.clearTimeout(settlementTimer);
             layoutObserver.disconnect();
@@ -828,7 +798,7 @@
           const offset = Number.parseInt(target.dataset.norouOffset || "120", 10);
           const alignAfterLayout = () => {
             const delta = target.getBoundingClientRect().top - offset;
-            if (Math.abs(delta) > 1) animateDesktopScrollTo(window.scrollY + delta);
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "auto" });
           };
           alignAfterLayout();
           setActiveNavigation(id);
