@@ -745,6 +745,13 @@
 
         const isDesktopNavigation = () => window.matchMedia("(min-width: 810px)").matches;
 
+        const isUsableSectionTarget = (target) => {
+          if (!(target instanceof Element) || !target.isConnected) return false;
+          const rect = target.getBoundingClientRect();
+          const style = window.getComputedStyle(target);
+          return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+        };
+
         const settleDesktopNavigation = (target, offset) => {
           if (!isDesktopNavigation()) return;
           stopDesktopNavigationSettlement();
@@ -790,11 +797,11 @@
             return true;
           }
           let target = document.getElementById(id);
-          if (isDesktopNavigation() && (!target || target.offsetParent === null)) {
+          if (isDesktopNavigation() && !isUsableSectionTarget(target)) {
             improveNavigation();
             target = document.getElementById(id);
           }
-          if (!target || (isDesktopNavigation() && target.offsetParent === null)) return false;
+          if (!isUsableSectionTarget(target)) return false;
           const offset = Number.parseInt(target.dataset.norouOffset || "120", 10);
           const alignAfterLayout = () => {
             const delta = target.getBoundingClientRect().top - offset;
@@ -870,11 +877,9 @@
             if ((event.type === "pointerdown" && event.pointerType !== "touch" && event.button !== 0) || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             const source = event.target;
             if (!(source instanceof Element)) return;
-            const link = source.closest('nav a[href^="#"]');
+            const link = source.closest('a[href^="#"]');
             const id = link?.getAttribute("href")?.slice(1);
             if (!id || !sectionIds.has(id)) return;
-            const target = document.getElementById(id);
-            if (!target) return;
             if (link.closest(".norou-mobile-navigation")) setMobileNavigationOpen(false);
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -893,7 +898,7 @@
               return;
             }
             const source = event.target;
-            const link = source instanceof Element ? source.closest('nav a[href^="#"]') : null;
+            const link = source instanceof Element ? source.closest('a[href^="#"]') : null;
             if (link instanceof HTMLAnchorElement && link.dataset.norouPointerHandled === "true") {
               delete link.dataset.norouPointerHandled;
               event.preventDefault();
