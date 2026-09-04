@@ -758,7 +758,7 @@
           if (desktopScrollAnimationFrame) return;
           const startY = window.scrollY;
           const startedAt = performance.now();
-          const duration = 320;
+          const duration = 240;
           const step = (now) => {
             const progress = Math.min(1, (now - startedAt) / duration);
             const eased = 1 - ((1 - progress) ** 3);
@@ -831,7 +831,6 @@
             if (Math.abs(delta) > 1) animateDesktopScrollTo(window.scrollY + delta);
           };
           alignAfterLayout();
-          settleDesktopNavigation(target, offset);
           setActiveNavigation(id);
           return true;
         };
