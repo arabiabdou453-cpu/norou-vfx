@@ -754,7 +754,7 @@
           const align = () => {
             alignmentFrame = 0;
             const delta = target.getBoundingClientRect().top - offset;
-            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "auto" });
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "smooth" });
           };
           const queueAlignment = () => {
             if (!initialResizeNotificationSkipped) {
@@ -798,9 +798,10 @@
           const offset = Number.parseInt(target.dataset.norouOffset || "120", 10);
           const alignAfterLayout = () => {
             const delta = target.getBoundingClientRect().top - offset;
-            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "auto" });
+            if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: "smooth" });
           };
           alignAfterLayout();
+          settleDesktopNavigation(target, offset);
           setActiveNavigation(id);
           return true;
         };
