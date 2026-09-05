@@ -102,15 +102,16 @@ Contact   →  project inquiries and social contact paths
 
 ```text
 norouvfx-ready-to-upload/
-├── index.html                 # Portfolio markup and content
+├── index.html                 # Framer markup, responsive styles and navigation
 ├── assets/
-│   ├── norou-navigation.js    # Navigation and section behavior
-│   ├── norou-navigation.css   # Navigation interaction styles
 │   ├── norou-player.js        # Inline video player behavior
 │   └── norou-player.css       # Player and responsive styles
 ├── robots.txt                 # Crawler guidance
 └── tests/
-    └── static-audit.ps1       # Static quality checks
+    ├── static-audit.ps1       # Static quality checks
+    ├── contact-stability.cjs  # Contact activation, refresh and section navigation
+    ├── runtime-recovery.cjs   # Late replacement and missing-section recovery
+    └── design-parity.cjs      # Rendered design comparison against release a677fe1
 ```
 
 ## 🚀 Run locally
@@ -122,6 +123,23 @@ python -m http.server 8000
 ```
 
 Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+
+### Maintenance and regression checks
+
+Framer exports responsive component variants for different screen widths. Hidden
+variants are not unused copies: removing them without rebuilding the Framer source
+can break hydration or responsive layout. The local enhancements restore navigation
+anchors after structural changes without recursively rebuilding on scroll. Video
+playback is owned only by `assets/norou-player.js`; the obsolete modal and unused
+alternative navigation implementation have been removed.
+
+Run `tests/static-audit.ps1` from PowerShell. The browser regression scripts require
+Playwright and Chrome, with this folder served at `http://127.0.0.1:4174`. Set
+`PLAYWRIGHT_MODULE` to an existing Playwright installation if it is not on Node's
+module path, then run each `.cjs` script with Node. This static export has no package
+build or TypeScript compiler step. These checks do not certify every browser or
+external Framer dependency. The existing hidden navbar at tablet width remains a
+separate known limitation; this cleanup does not redesign it.
 
 ## 🔗 Explore the portfolio
 

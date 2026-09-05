@@ -552,22 +552,6 @@
       .norou-skip-link{position:fixed;top:12px;left:12px;z-index:2147483647;padding:12px 18px;border-radius:10px;background:#fff;color:#0d0d0d;font:700 15px/1.2 Arial,sans-serif;transform:translateY(-180%);transition:transform .2s ease}
       .norou-skip-link:focus{transform:translateY(0)}
       :focus-visible{outline:3px solid #8b6cff!important;outline-offset:4px!important}
-      .norou-video-launcher{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:inherit;overflow:hidden;cursor:pointer;background-color:#0d0d0d;background-position:center;background-repeat:no-repeat;background-size:cover;color:#fff}
-      .norou-video-launcher:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.72))}
-      .norou-video-launcher__play{position:absolute;top:50%;left:50%;display:grid;place-items:center;width:72px;height:72px;border:1px solid rgba(255,255,255,.65);border-radius:50%;background:rgba(98,59,255,.88);box-shadow:0 12px 36px rgba(0,0,0,.45);font-size:30px;line-height:1;transform:translate(-50%,-50%);transition:transform .2s ease,background .2s ease}
-      .norou-video-launcher:hover .norou-video-launcher__play,.norou-video-launcher:focus-visible .norou-video-launcher__play{background:#623bff;transform:translate(-50%,-50%) scale(1.08)}
-      .norou-video-launcher__title{position:absolute;right:18px;bottom:16px;left:18px;overflow:hidden;font:700 15px/1.35 Arial,sans-serif;text-align:left;text-overflow:ellipsis;white-space:nowrap}
-      .norou-video-modal{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:clamp(12px,3vw,40px);background:rgba(0,0,0,.92);backdrop-filter:blur(12px)}
-      .norou-video-modal[data-open="true"]{display:flex}
-      .norou-video-modal__dialog{position:relative;width:min(1120px,100%);border:1px solid rgba(255,255,255,.18);border-radius:18px;background:#080808;box-shadow:0 24px 90px rgba(0,0,0,.7);overflow:hidden}
-      .norou-video-modal__frame{position:relative;width:100%;aspect-ratio:16/9;background:#000}
-      .norou-video-modal iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-      .norou-video-modal__bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;color:#fff}
-      .norou-video-modal__title{min-width:0;overflow:hidden;font:700 15px/1.35 Arial,sans-serif;text-overflow:ellipsis;white-space:nowrap}
-      .norou-video-modal__controls{display:flex;flex:none;gap:8px}
-      .norou-video-modal button{display:inline-grid;place-items:center;min-width:44px;height:44px;padding:0 14px;border:1px solid rgba(255,255,255,.24);border-radius:12px;background:#1f1f1f;color:#fff;cursor:pointer;font:700 14px/1 Arial,sans-serif}
-      .norou-video-modal button:hover{background:#623bff}
-      .norou-video-modal__close{position:absolute;top:12px;right:12px;z-index:2;border-color:rgba(255,255,255,.4)!important;background:rgba(0,0,0,.72)!important;font-size:22px!important}
       button[aria-label="Previous"],button[aria-label="Next"]{min-width:44px!important;min-height:44px!important}
       #__framer-badge-container{display:none!important}
       @media(min-width:810px){.norou-service-card-wrap{height:auto!important;min-height:0!important}.norou-service-card{min-height:150px!important;height:auto!important;padding:22px 36px!important}}
@@ -612,15 +596,6 @@
       @media(max-width:600px){
         .norou-youtube-container{width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important}
         iframe[src*="youtube-nocookie.com/embed/"]{width:100%!important;max-width:100%!important;height:100%!important}
-        .norou-video-modal{padding:8px}
-        .norou-video-modal__dialog{width:100%;max-width:100%;border-radius:12px}
-        .norou-video-modal__frame{aspect-ratio:16/10}
-        .norou-video-modal__bar{align-items:flex-start;flex-direction:column;padding:10px}
-        .norou-video-modal__controls{width:100%}
-        .norou-video-modal__controls button{flex:1}
-        .norou-video-launcher__play{width:62px;height:62px}
-        .norou-video-modal__title{max-width:calc(100% - 8px);white-space:normal;overflow-wrap:anywhere}
-        .norou-video-modal__close{top:8px;right:8px}
       }
       @media (prefers-reduced-motion: reduce){
         *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -655,15 +630,12 @@
           ["-BWhYYHI5Wk", "Premium 3D Viral Style for Cutflow Agency"],
           ["lejcLUhH5IA", "Project for Gusto Product"]
         ]);
-        const gallery = [];
         const sectionIds = new Set(["home", "work", "services", "about", "contact"]);
         const navigationTargets = [
           { label: "Work", href: "#work" },
           { label: "Services", href: "#services" },
           { label: "Contact", href: "#contact" }
         ];
-        let activeIndex = 0;
-        let lastTrigger = null;
         let navigationSyncFrame = 0;
         let stopDesktopNavigationSettlement = () => {};
         let setMobileNavigationOpen = () => {};
@@ -671,52 +643,6 @@
         const safeVideoId = (source) => {
           const match = source.match(/youtube(?:-nocookie)?\.com\/embed\/([A-Za-z0-9_-]{11})/);
           return match ? match[1] : null;
-        };
-
-        const modal = document.createElement("div");
-        modal.className = "norou-video-modal";
-        modal.setAttribute("role", "dialog");
-        modal.setAttribute("aria-modal", "true");
-        modal.setAttribute("aria-label", "Portfolio video player");
-        modal.dataset.open = "false";
-        modal.innerHTML = '<div class="norou-video-modal__dialog"><button class="norou-video-modal__close" type="button" aria-label="Close video" data-video-action="close">×</button><div class="norou-video-modal__frame"></div><div class="norou-video-modal__bar"><div class="norou-video-modal__title" aria-live="polite"></div><div class="norou-video-modal__controls"><button type="button" data-video-action="previous" aria-label="Previous video">Previous</button><button type="button" data-video-action="next" aria-label="Next video">Next</button><button type="button" data-video-action="close">Close</button></div></div></div>';
-
-        const frameHost = modal.querySelector(".norou-video-modal__frame");
-        const modalTitle = modal.querySelector(".norou-video-modal__title");
-
-        const renderActiveVideo = () => {
-          const item = gallery[activeIndex];
-          if (!item || !frameHost || !modalTitle) return;
-          const player = document.createElement("iframe");
-          player.src = `https://www.youtube-nocookie.com/embed/${item.id}?autoplay=0&controls=1&playsinline=1&rel=0&modestbranding=1`;
-          player.title = item.title;
-          player.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share";
-          player.allowFullscreen = true;
-          player.referrerPolicy = "strict-origin-when-cross-origin";
-          frameHost.replaceChildren(player);
-          modalTitle.textContent = item.title;
-        };
-
-        const openVideo = (index, trigger) => {
-          if (!gallery.length) return;
-          activeIndex = (index + gallery.length) % gallery.length;
-          lastTrigger = trigger || null;
-          renderActiveVideo();
-          modal.dataset.open = "true";
-          document.body.style.overflow = "hidden";
-          modal.querySelector('[data-video-action="close"]')?.focus();
-        };
-
-        const closeVideo = () => {
-          modal.dataset.open = "false";
-          document.body.style.overflow = "";
-          frameHost?.replaceChildren();
-          lastTrigger?.focus();
-        };
-
-        const moveVideo = (direction) => {
-          activeIndex = (activeIndex + direction + gallery.length) % gallery.length;
-          renderActiveVideo();
         };
 
         const enhanceYouTubeFrames = () => {
@@ -835,11 +761,9 @@
           const marker = window.scrollY + Math.min(window.innerHeight * 0.32, 240);
           let activeId = "home";
           sectionIds.forEach((id) => {
-            let target = document.getElementById(id);
-            if (!target) {
-              improveNavigation();
-              target = document.getElementById(id);
-            }
+            // Status updates only read anchors. A navigation action repairs them.
+            // Calling improveNavigation here would recurse while a section is absent.
+            const target = document.getElementById(id);
             if (!target) return;
             const targetTop = window.scrollY + target.getBoundingClientRect().top;
             if (targetTop <= marker) activeId = id;
@@ -1072,10 +996,11 @@
           }
 
           const navigationHost = document.getElementById("main");
-          if (desktopNavigationEnabled && navigationHost && document.documentElement.dataset.norouNavigationObserver !== "true") {
+          if (navigationHost && document.documentElement.dataset.norouNavigationObserver !== "true") {
             document.documentElement.dataset.norouNavigationObserver = "true";
             const observer = new MutationObserver(() => {
-              if (!hasCompleteNavigation() || !document.getElementById("contact") || !document.querySelector("footer .norou-copyright")) {
+              const missingAnchor = Array.from(sectionIds).some((id) => !document.getElementById(id));
+              if ((isDesktopNavigation() && !hasCompleteNavigation()) || missingAnchor || !document.querySelector("footer .norou-copyright")) {
                 // Repairs mutate this subtree too; do not observe our own writes.
                 observer.disconnect();
                 improveNavigation();
@@ -1083,7 +1008,6 @@
               }
             });
             observer.observe(navigationHost, { childList: true, subtree: true });
-            window.setTimeout(() => observer.disconnect(), 8000);
           }
         };
 
@@ -1152,21 +1076,6 @@
           improveInteractiveSemantics();
         };
 
-        modal.addEventListener("click", (event) => {
-          const target = event.target;
-          if (!(target instanceof Element)) return;
-          const action = target.closest("[data-video-action]")?.getAttribute("data-video-action");
-          if (action === "close" || target === modal) closeVideo();
-          if (action === "previous") moveVideo(-1);
-          if (action === "next") moveVideo(1);
-        });
-        document.addEventListener("keydown", (event) => {
-          if (modal.dataset.open !== "true") return;
-          if (event.key === "Escape") closeVideo();
-          if (event.key === "ArrowLeft") moveVideo(-1);
-          if (event.key === "ArrowRight") moveVideo(1);
-        });
-
         const startEnhancements = () => {
           if (document.documentElement.dataset.norouEnhancementsStarted === "true") return;
           document.documentElement.dataset.norouEnhancementsStarted = "true";
@@ -1174,15 +1083,6 @@
         };
 
         window.addEventListener("load", startEnhancements, { once: true });
-        window.addEventListener("load", () => {
-          const id = window.location.hash.slice(1);
-          if (sectionIds.has(id)) {
-            improveNavigation();
-            window.requestAnimationFrame(() => scrollToSection(id));
-          } else {
-            syncActiveNavigation();
-          }
-        }, { once: true });
       })();
     </script>
     

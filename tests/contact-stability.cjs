@@ -72,7 +72,12 @@ const baseURL = process.env.TEST_URL || 'http://127.0.0.1:4174/index.html';
         await page.waitForTimeout(700);
         assert.deepEqual(await measure(), before, `${width}px Contact changed after ${activation}`);
       }
-      await page.reload({ waitUntil: 'load' });
+      try {
+        await page.reload({ waitUntil: 'load' });
+      } catch (error) {
+        console.log('Pending resources after reload:', [...pending]);
+        throw error;
+      }
       await page.waitForTimeout(1800);
       if (hasDesktopLinks) await navigate('contact');
       else await page.locator('footer').filter({ visible: true }).scrollIntoViewIfNeeded();
