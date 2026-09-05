@@ -133,6 +133,11 @@ anchors after structural changes without recursively rebuilding on scroll. Video
 playback is owned only by `assets/norou-player.js`; the obsolete modal and unused
 alternative navigation implementation have been removed.
 
+The early `norou-copy-stability` adapter preserves the corrected Contact sentence
+when the externally hosted export inserts its older misspelling. It only touches
+that exact text node, without replacing elements or changing typography. Run
+`node tests/copy-stability.cjs` to sample the visible copy during load and refresh.
+
 Run `tests/static-audit.ps1` from PowerShell. The browser regression scripts require
 Playwright and Chrome, with this folder served at `http://127.0.0.1:4174`. Set
 `PLAYWRIGHT_MODULE` to an existing Playwright installation if it is not on Node's
@@ -140,6 +145,12 @@ module path, then run each `.cjs` script with Node. This static export has no pa
 build or TypeScript compiler step. These checks do not certify every browser or
 external Framer dependency. The existing hidden navbar at tablet width remains a
 separate known limitation; this cleanup does not redesign it.
+
+To package only deployable files, run `scripts/package-site.ps1` in PowerShell.
+It creates a new timestamped folder and ZIP under `releases/`, checks the copied
+files' hashes, and leaves backups, logs, tests and Git metadata out of the upload.
+It does not overwrite previous packages. Assets hosted by Framer and Google still
+require a network connection; the ZIP is not an offline version of the site.
 
 ## 🔗 Explore the portfolio
 

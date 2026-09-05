@@ -1,0 +1,12 @@
+# Local secrets and machine-specific artifacts
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+node_modules/
+*.log
+/index.mobile-fix-backup.html
+/index2.html
+/tests/*.png
+/releases/

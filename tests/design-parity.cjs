@@ -33,7 +33,9 @@ const baseline = execFileSync('git', ['show', 'a677fe1:index.html'], { encoding:
         assert.equal(await page.locator('footer').filter({ visible: true }).count(), 1, `${width}px one visible Contact`);
         await page.close();
       }
-      assert.deepEqual(snapshots[1], snapshots[0], `${width}px cleanup must preserve rendered design`);
+      // The only intentional copy correction; all dimensions and styles still match.
+      const expectedDesign = snapshots[0].map(item => ({ ...item, text: item.text.replace('porject ideas', 'project ideas') }));
+      assert.deepEqual(snapshots[1], expectedDesign, `${width}px cleanup must preserve rendered design`);
       console.log(`PASS ${width}px: ${snapshots[0].length} visible elements preserve dimensions, text, fonts, colors, padding and corners`);
     }
   } finally {

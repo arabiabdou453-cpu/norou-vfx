@@ -6,6 +6,34 @@
     
     
     <!-- Start of headStart -->
+    <script id="norou-copy-stability">
+      (() => {
+        "use strict";
+        // The immutable Framer export contains an older misspelling. Keep the
+        // local, corrected copy when that text is inserted, before the next paint.
+        const exportedCopy = "Got questions, porject ideas, or just want to say hi? We're all ears!";
+        const correctText = (node) => {
+          if (node instanceof Text && node.data.trim() === exportedCopy && node.parentElement?.closest("footer")) {
+            node.data = node.data.replace("porject", "project");
+          }
+        };
+        const inspectAddedNode = (node) => {
+          if (node instanceof Text) return correctText(node);
+          if (!(node instanceof Element)) return;
+          const roots = node.closest("footer") ? [node] : node.querySelectorAll("footer");
+          for (const root of roots) {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            while (walker.nextNode()) correctText(walker.currentNode);
+          }
+        };
+        new MutationObserver((records) => {
+          for (const record of records) {
+            if (record.type === "characterData") correctText(record.target);
+            else record.addedNodes.forEach(inspectAddedNode);
+          }
+        }).observe(document.documentElement, { childList: true, characterData: true, subtree: true });
+      })();
+    </script>
     <script id="norou-youtube-guard">
       (() => {
         "use strict";
@@ -51,8 +79,6 @@
       nav a[data-norou-section-link]:hover .framer-1fjbrv2{background:#623bff!important;opacity:1!important}
       nav a[data-norou-section-link]:hover .framer-32evbh{--extracted-r6o4lv:#623bff!important}
       nav a[data-norou-section-link]:hover p{--framer-text-color:#623bff!important;color:#623bff!important}
-      #main nav{visibility:hidden!important}
-      html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
       #main nav{visibility:hidden!important}
       html[data-norou-nav-ready="true"] #main nav{visibility:visible!important}
       #main footer .framer-1ju9ey8-container:has(> a[href^="https://www.instagram.com/norou.vfx"]){display:none!important}
